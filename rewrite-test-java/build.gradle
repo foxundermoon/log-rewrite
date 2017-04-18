@@ -1,6 +1,7 @@
 version 'unspecified'
 
 apply plugin: 'java'
+apply plugin: 'idea'
 apply plugin: 'application'
 
 sourceCompatibility = 1.8
@@ -13,4 +14,14 @@ repositories {
 mainClassName = 'com.getui.rewrite.test.App'
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
+}
+def isRewrite = project.findProperty('rewrite')
+if (isRewrite) {
+    sourceSets {
+        main {
+            java {
+                srcDirs = ["build/rewrite/src/main/java"]
+            }
+        }
+    }
 }
