@@ -27,8 +27,8 @@ class LogRewriter(val options: Collection<RewriteOption>, val source: File, val 
                 .map { Paths.get(it.toURI()) }
                 .asStream().parallel()
                 .map { path ->
-                    val parserResult = parser.parse(listOf(path))
-                    parserResult
+                  val parserResult=  parser.parse(listOf(path))
+                          parserResult
                             .forEach { unit ->
                                 unit.refactor(Consumer { tx ->
                                     unit.classes.forEach { clazz ->
@@ -54,15 +54,15 @@ class LogRewriter(val options: Collection<RewriteOption>, val source: File, val 
                                     val fix = tx.fix()
                                     val fullPathStr = path.toFile().absolutePath
                                     val newPathStr = fullPathStr.replace(source.absolutePath, dist.absolutePath)
-                                    val newFile = File(newPathStr)
+                                    val newFile=File(newPathStr)
                                     val dir = newFile.parentFile
-                                    if (!dir.exists()) dir.mkdirs()
-                                    newFile.writeText(fix.print())
+                                            if(!dir.exists()) dir.mkdirs()
+                                            newFile.writeText(fix.print())
                                 })
                             }
-                    return@map parserResult
+                    return@map  parserResult
                 }
-                .forEach {}
+                .forEach{}
     }
 }
 
