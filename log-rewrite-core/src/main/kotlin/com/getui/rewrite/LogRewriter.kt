@@ -138,17 +138,17 @@ object LogMapping {
                             t as String
                             val id = pushMapping(clazz, t)
 
-                            val matcher = Pattern.compile("(?:.*?(%(?:[scbdxofaegh%n]|tx)).*?)+").matcher(t)
-                            if (matcher.find()) {
-                                val builder = StringBuilder()
+                            val matcher = Pattern.compile("(%(?:[scbdxofaegh%n]|tx))").matcher(t)
+                            val builder = StringBuilder()
+                            while (matcher.find()) {
                                 for (i in 1..matcher.groupCount()) {
                                     builder.append(FORMAT_PREFIX(id))
                                             .append(matcher.group(i))
                                             .append(FORMAT_POSTFIX)
                                 }
                                 originSb.append("String::format($t ,...)")
-                                return@changeLiteral builder.toString()
                             }
+                            return@changeLiteral builder.toString()
                             return@changeLiteral t
                         }
                     }
