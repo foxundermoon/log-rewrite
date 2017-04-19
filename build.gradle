@@ -5,7 +5,17 @@ buildscript {
         jcenter()
         mavenCentral()
     }
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
 //    dependencies {
 //        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
 //    }
+}
+apply plugin: 'kotlin'
+repositories {
+    mavenCentral()
+}
+dependencies {
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlin_version"
 }

@@ -10,16 +10,18 @@ buildscript {
 }
 
 apply plugin: 'kotlin'
+apply plugin: 'idea'
 apply plugin: 'application'
 version 'unspecified'
 mainClassName = 'com.getui.rewrite.LogRewriteAppKt'
 repositories {
     mavenCentral()
+    jcenter()
 }
 
 dependencies {
     compile project(':log-rewrite-core')
-    compile 'commons-cli:commons-cli:1.3.1'
+    compile 'com.xenomachina:kotlin-argparser:1.1.0'
     compile 'com.moandjiezana.toml:toml4j:0.7.1'
     compile "org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlin_version"
 

@@ -2,6 +2,8 @@ package com.getui
 
 import com.netflix.rewrite.ast.Expression
 import com.netflix.rewrite.ast.Tr
+import com.netflix.rewrite.ast.Type
+import com.netflix.rewrite.ast.asClass
 import com.netflix.rewrite.parse.OracleJdkParser
 import com.netflix.rewrite.parse.Parser
 import com.netflix.rewrite.refactor.Refactor
@@ -9,6 +11,7 @@ import org.apache.commons.lang.StringUtils
 import org.jetbrains.kotlin.com.intellij.util.containers.ConcurrentMultiMap
 import java.io.File
 import java.nio.file.Paths
+import java.util.*
 import java.util.concurrent.ConcurrentLinkedDeque
 import java.util.concurrent.atomic.AtomicLong
 import java.util.function.Consumer
@@ -25,7 +28,8 @@ class LogRewriter(val options: Collection<RewriteOption>, val source: File, val 
         val treeWalk = source.walk()
         val javaSources = treeWalk.filter { it.name.endsWith(".java", true) }
                 .map { Paths.get(it.toURI()) }
-                .asStream().parallel()
+                .asStream()
+//                .parallel()
                 .map { path ->
                     val parserResult = parser.parse(listOf(path))
                     parserResult
@@ -127,8 +131,18 @@ object LogMapping {
                     val arg0 = target.args.args[0]
                     when (arg0) {
                         is Tr.Ident -> {
-                            if (StringUtils.equals("locale", arg0.simpleName)) {
+                            if (isLocaleIdent(arg0)) {
                                 argFormat = target.args.args[1] as Tr.Literal
+                            }
+                        }
+                        is Tr.FieldAccess -> {
+                            val argTarget = arg0.target
+                            when (argTarget) {
+                                is Tr.Ident -> {
+                                    if (isLocaleIdent(argTarget)) {
+                                        argFormat = target.args.args[1] as Tr.Literal
+                                    }
+                                }
                             }
                         }
                         is Tr.Literal -> argFormat = arg0
@@ -158,6 +172,11 @@ object LogMapping {
     }
 }
 
+fun isLocaleIdent(target: Tr.Ident): Boolean {
+    val fullName=Locale::class.qualifiedName
+    val targetName = (target.type as Type.Class).fullyQualifiedName
+    return StringUtils.equals(fullName, targetName)
+}
 
 class RewriteOptionIllegalException(override val message: String?) : RuntimeException()
 

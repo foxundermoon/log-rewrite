@@ -29,7 +29,6 @@ dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlin_version"
     compile 'com.netflix.devinsight.rewrite:rewrite-core:1.0.0'
     compile "org.jetbrains.kotlin:kotlin-compiler-embeddable:$kotlin_version"
-
     testCompile 'junit:junit:4.12'
     testCompile "org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version"
 }
