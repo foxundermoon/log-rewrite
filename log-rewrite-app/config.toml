@@ -1,0 +1,20 @@
+[[unit]]
+[[unit.signatures]]
+sign="com.getui.rewrite.test.LogUtil log(String)"
+argsIndex=[0]
+
+[[unit.signatures]]
+sign="com.getui.rewrite.test.LogUtil log(String,String)"
+argsIndex=[1]
+
+[[unit.signatures]]
+sign="com.getui.rewrite.test.LogUtil debug(String)"
+#  ## default is argsIndex=[0]
+
+[unit.source]
+dirs=[
+"/Users/fox/workspace/getui/tools/log-rewrite/rewrite-test-java/src/main/java"
+]
+
+[unit.distribution]
+dir="/Users/fox/workspace/getui/tools/log-rewrite/rewrite-test-java/build/rewrite/src/main/java"

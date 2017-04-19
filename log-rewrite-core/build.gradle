@@ -18,7 +18,13 @@ repositories {
     mavenCentral()
 }
 
+configurations {
+//    compile.extendsFrom antlr4
+    compile.extendsFrom compileShaded
+}
+
 dependencies {
+    compileShaded files("${System.getProperty('java.home')}/../lib/tools.jar")
     compile "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
     compile "org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlin_version"
     compile 'com.netflix.devinsight.rewrite:rewrite-core:1.0.0'

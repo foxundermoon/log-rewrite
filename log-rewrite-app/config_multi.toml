@@ -1,0 +1,47 @@
+[[unit]]
+[[unit.signatures]]
+sign=""
+argsIndex=[1]
+isStatic=true
+
+[[unit.signatures]]
+sign=""
+argsIndex=[1]
+isStatic=true
+
+[unit.source]
+dirs=[
+"/Users/fox/workspace/getui/tools/log-rewrite/rewrite-test-java/src/main/java"
+]
+#includeExt=[".java"] #ignore include all
+#excludeExt=[]  #ignore or empty will  exclude none
+
+[unit.distribution]
+dir="/Users/fox/workspace/getui/tools/log-rewrite/rewrite-test-java/build/rewrite/src/main/java"
+
+##########################################################################################
+
+# another rewrite unit
+[[unit]]
+[[unit.signatures]]
+sign=""
+argsIndex=[1] #
+isStatic=true
+
+[[unit.signatures]]
+sign=""
+argsIndex=[1]
+isStatic=true
+
+[unit.source]
+dirs=[
+"/Users/fox/workspace/getui/tools/log-rewrite/rewrite-test-android/src/main/java"
+]
+includeExt=[
+".java"
+]
+#excludeExt=[]
+
+[unit.distribution]
+dir="/Users/fox/workspace/getui/tools/log-rewrite/rewrite-test-android/build/rewrite/src/main/java"
+
