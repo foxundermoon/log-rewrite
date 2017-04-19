@@ -2,12 +2,10 @@
 [[unit.signatures]]
 sign=""
 argsIndex=[1]
-isStatic=true
 
 [[unit.signatures]]
 sign=""
 argsIndex=[1]
-isStatic=true
 
 [unit.source]
 dirs=[
@@ -26,12 +24,10 @@ dir="/Users/fox/workspace/getui/tools/log-rewrite/rewrite-test-java/build/rewrit
 [[unit.signatures]]
 sign=""
 argsIndex=[1] #
-isStatic=true
 
 [[unit.signatures]]
 sign=""
 argsIndex=[1]
-isStatic=true
 
 [unit.source]
 dirs=[
