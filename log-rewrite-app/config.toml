@@ -18,3 +18,4 @@ dirs=[
 
 [unit.distribution]
 dir="/Users/fox/workspace/getui/tools/log-rewrite/rewrite-test-java/build/rewrite/src/main/java"
+mappingDir="/Users/fox/workspace/getui/tools/log-rewrite/rewrite-test-java/build/rewrite/mapping"

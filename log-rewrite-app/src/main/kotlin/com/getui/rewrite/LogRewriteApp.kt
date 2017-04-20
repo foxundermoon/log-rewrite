@@ -89,7 +89,15 @@ class App(val config: File) {
                 }
                 RewriteOption(signature, index, true)
             }
-            LogRewriter(options, File(unit.source.dirs[0]), File(unit.distribution.dir)).rewrite()
+            val dist = unit.distribution
+            val distDir = File(dist.dir)
+            val mappingDir = dist.mappingDir
+            val distMappingDir = if (StringUtils.isEmpty(mappingDir)) {
+                distDir.parentFile
+            } else {
+                distDir.parentFile
+            }
+            LogRewriter(options, File(unit.source.dirs[0]), distDir, distMappingDir).rewrite()
         }
     }
 }

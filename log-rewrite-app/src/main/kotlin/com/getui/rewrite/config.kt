@@ -47,5 +47,5 @@ object Config {
     class Unit(val signatures: Array<Signature>, val source: Source, val distribution: Distribution)
     class Signature(val sign: String, val argsIndex: IntArray = intArrayOf(0), val isStatic: Boolean = true)
     class Source(val dirs: Array<String>, val includeExt: Array<String>?, val excludeExt: Array<String>?)
-    data class Distribution(val dir: String)
+    data class Distribution(val dir: String, val mappingDir: String? = null)
 }

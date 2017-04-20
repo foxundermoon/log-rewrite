@@ -3,7 +3,6 @@ package com.getui
 import com.netflix.rewrite.ast.Expression
 import com.netflix.rewrite.ast.Tr
 import com.netflix.rewrite.ast.Type
-import com.netflix.rewrite.ast.asClass
 import com.netflix.rewrite.parse.OracleJdkParser
 import com.netflix.rewrite.parse.Parser
 import com.netflix.rewrite.refactor.Refactor
@@ -21,12 +20,21 @@ import kotlin.streams.asStream
 /**
  * Created by fox on 12/04/2017.
  */
-class LogRewriter(val options: Collection<RewriteOption>, val source: File, val dist: File) {
+class LogRewriter(val options: Collection<RewriteOption>, val source: File, val dist: File, val distDir: File = dist.parentFile) {
     val parser: Parser = OracleJdkParser()
+    val logMapping = LogMapping(distDir)
 
     fun rewrite(): Unit {
         val treeWalk = source.walk()
-        val javaSources = treeWalk.filter { it.name.endsWith(".java", true) }
+        val javaSources = treeWalk
+                .apply {
+                    filter { it.isFile && !it.name.endsWith(".java") }
+                            .forEach {
+                                val newFile = transformDistPath(it, source, dist)
+                                it.copyTo(newFile, true)
+                            }
+                }
+                .filter { it.name.endsWith(".java", true) }
                 .map { Paths.get(it.toURI()) }
                 .asStream()
 //                .parallel()
@@ -50,36 +58,42 @@ class LogRewriter(val options: Collection<RewriteOption>, val source: File, val 
 |-> ${mc.simpleName}
 """.trimMargin())
                                                             val expression = args[option.argumentIndex]
-                                                            LogMapping.refactor(clazz, expression, tx)
+                                                            logMapping.refactor(clazz, expression, tx)
                                                         }
                                             }
                                         }
                                     }
                                     val fix = tx.fix()
-                                    val fullPathStr = path.toFile().absolutePath
-                                    val newPathStr = fullPathStr.replace(source.absolutePath, dist.absolutePath)
-                                    val newFile = File(newPathStr)
-                                    val dir = newFile.parentFile
-                                    if (!dir.exists()) dir.mkdirs()
+                                    val newFile = transformDistPath(path.toFile(), source, dist)
                                     newFile.writeText(fix.print())
                                 })
                             }
                     return@map parserResult
                 }
                 .forEach {}
+        logMapping.finish()
+
     }
 }
 
+fun transformDistPath(srcFile: File, srcDir: File, dist: File): File {
+    val fullPathStr = srcFile.absolutePath
+    val newPathStr = fullPathStr.replace(srcDir.absolutePath, dist.absolutePath)
+    val newFile = File(newPathStr)
+    val dir = newFile.parentFile
+    if (!dir.exists()) dir.mkdirs()
+    return newFile
+}
 
-object LogMapping {
-    const val PREFIX = "<!--["
-    const val POSTFIX = "]-->"
-    val FORMAT_PREFIX = fun(id: Long): String { return "<!--$id{" }
-    const val FORMAT_POSTFIX = "}-->"
+const val PREFIX = "<!--["
+const val POSTFIX = "]-->"
+val FORMAT_PREFIX = fun(id: Long): String { return "<!--$id{" }
+const val FORMAT_POSTFIX = "}-->"
 
-    const val IDENT_PREFIX = "<!--("
-    const val IDENT_POSTFIX = ")-->"
+const val IDENT_PREFIX = "<!--("
+const val IDENT_POSTFIX = ")-->"
 
+class LogMapping(val distDir: File) {
     data class Item(val clazz: Tr.ClassDecl, val placement: String, val id: Long)
 
     val mapping: ConcurrentLinkedDeque<Item> = ConcurrentLinkedDeque()
@@ -94,6 +108,30 @@ object LogMapping {
 
     fun finish(): Unit {
 //todo write mapping to disk
+        val parent = distDir.parentFile
+        if (!parent.exists()) {
+            parent.mkdirs()
+        }
+
+        File(distDir, "log_mapping.txt").bufferedWriter().use { out ->
+            mapping.groupBy { it.clazz }
+                    .forEach { t, u ->
+                        out.write("#${(t.type as Type.Class).fullyQualifiedName}")
+                        out.newLine()
+                        u.forEach {
+                            out.write("${it.id}=${it.placement}")
+                            out.newLine()
+                        }
+                    }
+        }
+
+        File(distDir, "humen_mapping.txt").bufferedWriter().use { out ->
+            originMapping.entrySet().forEach { t ->
+                out.write((t.key.type as Type.Class).fullyQualifiedName)
+                out.newLine()
+                t.value?.forEach { out.write("  $it") }
+            }
+        }
     }
 
     private fun pushMapping(clazz: Tr.ClassDecl, placement: String): Long {
@@ -173,7 +211,7 @@ object LogMapping {
 }
 
 fun isLocaleIdent(target: Tr.Ident): Boolean {
-    val fullName=Locale::class.qualifiedName
+    val fullName = Locale::class.qualifiedName
     val targetName = (target.type as Type.Class).fullyQualifiedName
     return StringUtils.equals(fullName, targetName)
 }
