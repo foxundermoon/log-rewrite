@@ -129,7 +129,9 @@ class LogMapping(val distDir: File) {
             originMapping.entrySet().forEach { t ->
                 out.write((t.key.type as Type.Class).fullyQualifiedName)
                 out.newLine()
-                t.value?.forEach { out.write("  $it") }
+                t.value?.forEach {
+                    out.write("  $it")
+                }
             }
         }
     }
@@ -148,12 +150,10 @@ class LogMapping(val distDir: File) {
                         is String -> {
                             val id = pushMapping(clazz, t)
                             originSb.append("$PREFIX$t$POSTFIX")
+                            originMapping.putValue(clazz, originSb.toString())
                             return@changeLiteral "$PREFIX$id$POSTFIX"
                         }
-                        else -> {
-                            originSb.append(t)
-                            return@changeLiteral t
-                        }
+                        else -> return@changeLiteral t
                     }
                 }
             }
@@ -200,8 +200,8 @@ class LogMapping(val distDir: File) {
                                 }
                                 originSb.append("String::format($t ,...)")
                             }
+                            originMapping.putValue(clazz, originSb.toString())
                             return@changeLiteral builder.toString()
-                            return@changeLiteral t
                         }
                     }
                 }
