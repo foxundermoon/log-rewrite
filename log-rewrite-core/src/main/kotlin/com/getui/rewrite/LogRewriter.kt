@@ -20,7 +20,7 @@ import kotlin.streams.asStream
 /**
  * Created by fox on 12/04/2017.
  */
-class LogRewriter(val options: Collection<RewriteOption>, val source: File, val dist: File, val distDir: File = dist.parentFile) {
+class LogRewriter(val options: Collection<RewriteOption>, val source: File, val dist: File, val distDir: File) {
     val parser: Parser = OracleJdkParser()
     val logMapping = LogMapping(distDir)
 
@@ -36,43 +36,39 @@ class LogRewriter(val options: Collection<RewriteOption>, val source: File, val 
                 }
                 .filter { it.name.endsWith(".java", true) }
                 .map { Paths.get(it.toURI()) }
-                .asStream()
+//                .asStream()
 //                .parallel()
-                .map { path ->
-                    val parserResult = parser.parse(listOf(path))
-                    parserResult
-                            .forEach { unit ->
-                                unit.refactor(Consumer { tx ->
-                                    unit.classes.forEach { clazz ->
-                                        options.forEach { option ->
-                                            if (option.isStaticMethod) {
-                                                clazz.findMethodCalls(option.signature)
-                                                        .forEach { mc ->
-                                                            val args = mc.args.args
-                                                            if (args.lastIndex < option.argumentIndex) throw RewriteOptionIllegalException(
-                                                                    """
-|on file :[$path]
+                .toList()
+        val parserResult = parser.parse(javaSources)
+        parserResult
+                .forEach { unit ->
+                    unit.refactor(Consumer { tx ->
+                        unit.classes.forEach { clazz ->
+                            options.forEach { option ->
+                                if (option.isStaticMethod) {
+                                    clazz.findMethodCalls(option.signature)
+                                            .forEach { mc ->
+                                                val args = mc.args.args
+                                                if (args.lastIndex < option.argumentIndex) throw RewriteOptionIllegalException(
+                                                        """
+|on file :[${unit.sourcePath}]
 |on class: [${clazz.javaClass.canonicalName}]
 |   the method [${mc.type?.declaringType?.fullyQualifiedName}] found by signature :[${option.signature}]
 |   the argument maxIndex:[${args.lastIndex}] less than your config :[${option.argumentIndex}]
 |-> ${mc.simpleName}
 """.trimMargin())
-                                                            val expression = args[option.argumentIndex]
-                                                            logMapping.refactor(clazz, expression, tx)
-                                                        }
+                                                val expression = args[option.argumentIndex]
+                                                logMapping.refactor(clazz, expression, tx)
                                             }
-                                        }
-                                    }
-                                    val fix = tx.fix()
-                                    val newFile = transformDistPath(path.toFile(), source, dist)
-                                    newFile.writeText(fix.print())
-                                })
+                                }
                             }
-                    return@map parserResult
+                        }
+                        val fix = tx.fix()
+                        val newFile = transformDistPath(File(unit.sourcePath), source, dist)
+                        newFile.writeText(fix.print())
+                    })
                 }
-                .forEach {}
         logMapping.finish()
-
     }
 }
 
@@ -150,7 +146,7 @@ class LogMapping(val distDir: File) {
                         is String -> {
                             val id = pushMapping(clazz, t)
                             originSb.append("$PREFIX$t$POSTFIX")
-                            originMapping.putValue(clazz, originSb.toString())
+//                            originMapping.putValue(clazz, originSb.toString())
                             return@changeLiteral "$PREFIX$id$POSTFIX"
                         }
                         else -> return@changeLiteral t
@@ -200,7 +196,7 @@ class LogMapping(val distDir: File) {
                                 }
                                 originSb.append("String::format($t ,...)")
                             }
-                            originMapping.putValue(clazz, originSb.toString())
+//                            originMapping.putValue(clazz, originSb.toString())
                             return@changeLiteral builder.toString()
                         }
                     }

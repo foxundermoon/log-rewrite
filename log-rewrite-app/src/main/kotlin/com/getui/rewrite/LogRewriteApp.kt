@@ -13,16 +13,19 @@ import java.io.File
 
 fun main(args: Array<String>): Unit {
 //    args?.forEach(::println)
-    val parser = ArgParser(args)
-    val myargs = App.Args(parser)
     var path = "config.toml"
-    if (StringUtils.isNotEmpty(myargs.config)) {
-        path = myargs.config
+    if(args.size>0){
+        val parser = ArgParser(args)
+        val myargs = App.Args(parser)
+        if (StringUtils.isNotEmpty(myargs.config)) {
+            path = myargs.config
+        }
     }
     val file = File(path)
     if (file.exists()) {
         App(file).rewrite()
     } else {
+        App(File("/Users/fox/workspace/getui/getui-sdkframework-android-as/gks/log_rewrite_config.toml")).rewrite()
         println("config file not found:[${file.absolutePath}]")
         println("usage |-c  --config   the config file path")
     }

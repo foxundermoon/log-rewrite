@@ -3,6 +3,7 @@ package com.getui.rewrite
 import com.getui.LogRewriter
 import com.getui.RewriteOption
 import org.junit.Test
+import java.io.File
 import java.nio.file.Paths
 
 /**
@@ -21,6 +22,7 @@ class TestRewriteSource {
                 )
                 , source.toFile()
                 , dist.toFile()
+                , Paths.get(rootProjectPath, "rewrite-test-java","build", "rewrite").toFile()
         )
         logRewriter.rewrite()
     }
