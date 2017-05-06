@@ -5,4 +5,5 @@ include 'log-rewrite-core'
 include 'log-rewrite-app'
 include 'rewrite-test-java'
 //include 'rewrite-test-android'
+include 'log-recover-app'
 

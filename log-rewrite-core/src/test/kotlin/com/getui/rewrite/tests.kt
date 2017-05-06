@@ -22,7 +22,9 @@ class TestRewriteSource {
                 )
                 , source.toFile()
                 , dist.toFile()
-                , Paths.get(rootProjectPath, "rewrite-test-java","build", "rewrite").toFile()
+                , Paths.get(rootProjectPath, "rewrite-test-java", "build", "rewrite").toFile()
+                , 3
+                , "demo"
         )
         logRewriter.rewrite()
     }

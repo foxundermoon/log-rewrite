@@ -13,20 +13,18 @@ public class RewriteTarget {
 
     public void test() {
         //literal
-//        LogUtil.log("i am the log message");
-
+        LogUtil.log("i am the log message");
         // simple expression
-//        LogUtil.log("hahahahhahaha" + new Date().toString() + "i am right expression");
-
+        LogUtil.log("hahahahhahaha" + new Date().toString() + "i am right expression");
         //format
         Calendar calendar = Calendar.getInstance();
-//        SimpleDateFormat format = new SimpleDateFormat("hh:mm:ss");
-//        LogUtil.log(TAG, String.format("now.... year:[%d], month:[%d], day:[%d], time:[%s]",
-//                calendar.get(Calendar.YEAR)
-//                , calendar.get(Calendar.MONTH)
-//                , calendar.get(Calendar.DAY_OF_MONTH)
-//                , format.format(calendar.getTime())
-//        ));
+        SimpleDateFormat format = new SimpleDateFormat("hh:mm:ss");
+        LogUtil.log(TAG, String.format("now.... year:[%d], month:[%d], day:[%d], time:[%s]",
+                calendar.get(Calendar.YEAR)
+                , calendar.get(Calendar.MONTH)
+                , calendar.get(Calendar.DAY_OF_MONTH)
+                , format.format(calendar.getTime())
+        ));
         LogUtil.log(String.format(Locale.CHINA, "我来自%s省-%s市", "浙江", "杭州"));
         //complex expression
         String aaa = " i am aaa as variable ";

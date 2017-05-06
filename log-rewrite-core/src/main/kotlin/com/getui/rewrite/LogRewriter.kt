@@ -20,9 +20,12 @@ import kotlin.streams.asStream
 /**
  * Created by fox on 12/04/2017.
  */
-class LogRewriter(val options: Collection<RewriteOption>, val source: File, val dist: File, val distDir: File) {
+
+const val VERSION_CODE = 1
+val formatArgsPattern=Pattern.compile("(%(?:[scbdxofaegh%n]|tx))")
+class LogRewriter(val options: Collection<RewriteOption>, val source: File, val dist: File, val distDir: File, val targetVersionCode: Int = 1, val projectName: String = "") {
     val parser: Parser = OracleJdkParser()
-    val logMapping = LogMapping(distDir)
+    val logMapping = LogMapping(distDir, targetVersionCode, projectName)
 
     fun rewrite(): Unit {
         val treeWalk = source.walk()
@@ -81,15 +84,20 @@ fun transformDistPath(srcFile: File, srcDir: File, dist: File): File {
     return newFile
 }
 
-const val PREFIX = "<!--["
-const val POSTFIX = "]-->"
-val FORMAT_PREFIX = fun(id: Long): String { return "<!--$id{" }
-const val FORMAT_POSTFIX = "}-->"
 
-const val IDENT_PREFIX = "<!--("
-const val IDENT_POSTFIX = ")-->"
+class LogMapping(val distDir: File, val targetVersionCode: Int, val projectName: String) {
+    val TOKEN = "$projectName|${VERSION_CODE}_$targetVersionCode:"
+    val PREFIX = "<!--["
+    val POSTFIX = "]-->"
+    val FORMAT_PREFIX = fun(id: Long): String { return "<!--$TOKEN$id{" }
+    val FORMAT_POSTFIX = "}-->"
+    private fun rewriteNormal(id: Long): String {
+        return "$PREFIX${TOKEN}$id$POSTFIX"
+    }
 
-class LogMapping(val distDir: File) {
+//    val IDENT_PREFIX = "<!--("
+//    val IDENT_POSTFIX = ")-->"
+
     data class Item(val clazz: Tr.ClassDecl, val placement: String, val id: Long)
 
     val mapping: ConcurrentLinkedDeque<Item> = ConcurrentLinkedDeque()
@@ -108,8 +116,10 @@ class LogMapping(val distDir: File) {
         if (!parent.exists()) {
             parent.mkdirs()
         }
+        val prefix = "${projectName}_v${VERSION_CODE}_$targetVersionCode"
 
-        File(distDir, "log_mapping.txt").bufferedWriter().use { out ->
+        File(distDir, "${prefix}_log_mapping.txt").bufferedWriter().use { out ->
+            out.write("#$projectName:$VERSION_CODE:$targetVersionCode")
             mapping.groupBy { it.clazz }
                     .forEach { t, u ->
                         out.write("#${(t.type as Type.Class).fullyQualifiedName}")
@@ -121,7 +131,7 @@ class LogMapping(val distDir: File) {
                     }
         }
 
-        File(distDir, "humen_mapping.txt").bufferedWriter().use { out ->
+        File(distDir, "${prefix}_human_mapping.txt").bufferedWriter().use { out ->
             originMapping.entrySet().forEach { t ->
                 out.write((t.key.type as Type.Class).fullyQualifiedName)
                 out.newLine()
@@ -138,6 +148,7 @@ class LogMapping(val distDir: File) {
         return id
     }
 
+
     private fun refactor(clazz: Tr.ClassDecl, target: Expression, refactor: Refactor, originSb: StringBuilder): Unit {
         when (target) {
             is Tr.Literal -> {
@@ -147,7 +158,7 @@ class LogMapping(val distDir: File) {
                             val id = pushMapping(clazz, t)
                             originSb.append("$PREFIX$t$POSTFIX")
 //                            originMapping.putValue(clazz, originSb.toString())
-                            return@changeLiteral "$PREFIX$id$POSTFIX"
+                            return@changeLiteral rewriteNormal(id)
                         }
                         else -> return@changeLiteral t
                     }
@@ -186,7 +197,7 @@ class LogMapping(val distDir: File) {
                             t as String
                             val id = pushMapping(clazz, t)
 
-                            val matcher = Pattern.compile("(%(?:[scbdxofaegh%n]|tx))").matcher(t)
+                            val matcher = formatArgsPattern.matcher(t)
                             val builder = StringBuilder()
                             while (matcher.find()) {
                                 for (i in 1..matcher.groupCount()) {
@@ -205,6 +216,7 @@ class LogMapping(val distDir: File) {
         }
     }
 }
+
 
 fun isLocaleIdent(target: Tr.Ident): Boolean {
     val fullName = Locale::class.qualifiedName

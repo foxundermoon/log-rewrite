@@ -1,3 +1,7 @@
+
+projectShortName="grd" #the shot name for target project
+versionCode=1
+
 [[unit]]
 [[unit.signatures]]
 sign="com.getui.rewrite.test.LogUtil log(String)"
@@ -6,6 +10,11 @@ argsIndex=[0]
 [[unit.signatures]]
 sign="com.getui.rewrite.test.LogUtil log(String,String)"
 argsIndex=[1]
+
+[[unit.signatures]]
+sign="com.getui.rewrite.test.LogUtil log(String,String)"
+argsIndex=[0]
+isTag=true
 
 [[unit.signatures]]
 sign="com.getui.rewrite.test.LogUtil debug(String)"

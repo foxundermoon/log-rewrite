@@ -1,3 +1,7 @@
+
+projectShotName="grd" #the shot name for target project
+versionCode=1
+
 [[unit]]
 [[unit.signatures]]
 sign=""

@@ -10,12 +10,12 @@ import java.io.File
 
 class ConfigReadTest {
     @Test fun readConfig(): kotlin.Unit {
-//        val configPath = "config.toml"
-        val configPath = "config_multi.toml"
+        val configPath = "config.toml"
+//        val configPath = "config_multi.toml"
         val cfgFile = File(configPath)
         try {
             val cfg = Config.read(cfgFile)
-            println(cfg.size)
+            println(cfg)
         } catch (e: Exception) {
             println(e)
         }

@@ -21,7 +21,7 @@ repositories {
 
 dependencies {
     compile project(':log-rewrite-core')
-    compile 'com.xenomachina:kotlin-argparser:1.1.0'
+    compile 'com.xenomachina:kotlin-argparser:2.0.0'
     compile 'com.moandjiezana.toml:toml4j:0.7.1'
     compile "org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlin_version"
 

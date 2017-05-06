@@ -14,20 +14,22 @@ import java.io.File
 fun main(args: Array<String>): Unit {
 //    args?.forEach(::println)
     var path = "config.toml"
-    if(args.size>0){
+    if (args.size > 0) {
         val parser = ArgParser(args)
         val myargs = App.Args(parser)
-        if (StringUtils.isNotEmpty(myargs.config)) {
-            path = myargs.config
+        myargs.run {
+            if (StringUtils.isNotEmpty(config)) {
+                path = config
+            }
+            val file = File(path)
+            if (file.exists()) {
+                App(file).rewrite()
+            }
         }
-    }
-    val file = File(path)
-    if (file.exists()) {
-        App(file).rewrite()
     } else {
         App(File("/Users/fox/workspace/getui/getui-sdkframework-android-as/gks/log_rewrite_config.toml")).rewrite()
-        println("config file not found:[${file.absolutePath}]")
-        println("usage |-c  --config   the config file path")
+//        println("config file not found:[${file.absolutePath}]")
+        println("usage |-c  --config   the config file path.")
     }
 
 
@@ -77,11 +79,12 @@ class App(val config: File) {
     class Args(parser: ArgParser) {
         val verbose by parser.flagging("-v", "--verbose", help = "enable verbose mode")
         val config by parser.storing("-c", "--config", help = "the config file path")
+//        val version by parser.storing("-V", "--version", help = "target version code [number]") { toInt() }
     }
 
     fun rewrite(): kotlin.Unit {
         val cfg = Config.read(config)
-        cfg.forEach { unit ->
+        cfg.unit.forEach { unit ->
             val options = unit.signatures.map { sign ->
                 val signature = sign.sign
                 val argsIndex = sign.argsIndex
@@ -100,7 +103,7 @@ class App(val config: File) {
             } else {
                 distDir.parentFile
             }
-            LogRewriter(options, File(unit.source.dirs[0]), distDir, distMappingDir).rewrite()
+            LogRewriter(options, File(unit.source.dirs[0]), distDir, distMappingDir, targetVersionCode = cfg.versionCode,projectName = cfg.projectShortName).rewrite()
         }
     }
 }
