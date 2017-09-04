@@ -4,3 +4,6 @@ build
 .gradletasknamecache
 !.gitignore
 *.iml
+.project
+.classpath
+.settings

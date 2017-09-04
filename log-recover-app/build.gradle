@@ -22,6 +22,15 @@ repositories {
     mavenCentral()
 }
 
+run {
+    args = [
+            '-m',
+            '../build/tmp/sdk_v1_1_log_mapping.txt',
+            '-l', "${rootDir}/build/tmp/31.log",
+            '-d', "$rootDir/build"
+    ]
+}
+
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlin_version"
     compile 'com.xenomachina:kotlin-argparser:2.0.0'

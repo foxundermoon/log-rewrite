@@ -119,15 +119,19 @@ class App(parser: ArgParser) {
                     line = reader.readLine()
                     if (line == null) break
                     if (!line.startsWith("#")) {
-                        val pair = line.split("=", limit = 2)
-                        val id = pair[0].toLong()
-                        val replaceMent = pair[1]
-                        var projMapping = mapping.get(projectName)
-                        if (projMapping == null) {
-                            projMapping = MultiMap<Long, MappingItem>()
-                            mapping.put(projectName, projMapping)
+                        try {
+                            val pair = line.split("=", limit = 2)
+                            val id = pair[0].toLong()
+                            val replaceMent = pair[1]
+                            var projMapping = mapping.get(projectName)
+                            if (projMapping == null) {
+                                projMapping = MultiMap<Long, MappingItem>()
+                                mapping.put(projectName, projMapping)
+                            }
+                            projMapping.putValue(id, MappingItem(id, replaceMent, projectName, appVersion.toInt(), targetVersion.toInt()))
+                        } catch (e: Exception) {
+                            e.printStackTrace()
                         }
-                        projMapping.putValue(id, MappingItem(id, replaceMent, projectName, appVersion.toInt(), targetVersion.toInt()))
                     }
                 }
             }

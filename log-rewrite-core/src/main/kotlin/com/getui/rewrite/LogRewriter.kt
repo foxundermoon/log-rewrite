@@ -22,7 +22,8 @@ import kotlin.streams.asStream
  */
 
 const val VERSION_CODE = 1
-val formatArgsPattern=Pattern.compile("(%(?:[scbdxofaegh%n]|tx))")
+val formatArgsPattern = Pattern.compile("(%(?:[scbdxofaegh%n]|tx))")
+
 class LogRewriter(val options: Collection<RewriteOption>, val source: File, val dist: File, val distDir: File, val targetVersionCode: Int = 1, val projectName: String = "") {
     val parser: Parser = OracleJdkParser()
     val logMapping = LogMapping(distDir, targetVersionCode, projectName)
@@ -120,6 +121,7 @@ class LogMapping(val distDir: File, val targetVersionCode: Int, val projectName:
 
         File(distDir, "${prefix}_log_mapping.txt").bufferedWriter().use { out ->
             out.write("#$projectName:$VERSION_CODE:$targetVersionCode")
+            out.newLine()
             mapping.groupBy { it.clazz }
                     .forEach { t, u ->
                         out.write("#${(t.type as Type.Class).fullyQualifiedName}")
